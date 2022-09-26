@@ -1,0 +1,8 @@
+# Assets
+/assets/
+
+# ENV
+.env
+
+# Config File
+/config/
