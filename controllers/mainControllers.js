@@ -100,6 +100,13 @@ const mainController = {
         }else{
             return res.status(500).json({error:'invalid key value.'});
         }
+    },
+
+    //required as body:
+    //key
+    //...
+    addQuestion : async function(req,res){
+        console.log(req.body);
     }
 }
 
