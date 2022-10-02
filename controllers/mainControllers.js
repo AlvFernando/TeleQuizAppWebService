@@ -2,6 +2,7 @@ const { sequelize } = require('../models');
 const { QueryTypes } = require('sequelize');
 const path = require('path');
 require('dotenv').config();
+var validator = require('validator');
 
 const mainController = {
     index : async function(req,res){
@@ -107,9 +108,28 @@ const mainController = {
     //key
     //...
     addQuestion : async function(req,res){
-        console.log('hit');
-        console.log(req.body);
-        res.send('hello');
+        if(req.body.key==process.env.API_KEY){
+            const validation = [true,true,true,true,true,true,true];
+            const questiontype = [1,2];
+            try{
+                //validation field
+                validation[0] = validator.isLength(req.body.username,[{min:0,max:30}]);
+                validation[1] = validator.isLength(req.body.question,[{min:0,max:100}]);
+                for(var i=0;i<req.body.option.length;i++){
+                    validation[i+2] = validator.isLength(req.body.option[i],[{min:0,max:50}]);
+                }
+                validation[6] = validator.isIn(req.body.questiontype,questiontype);
+                console.log(validation);
+            }catch(error){
+                return res.status(500).json({error:'invalid asset name.'});
+            }
+        }else{
+            return res.status(500).json({error:'invalid key value.'});
+        }
+
+        //console.log('hit');
+        //console.log(req.body);
+        //res.send('hello');
     }
 }
 

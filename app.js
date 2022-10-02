@@ -2,7 +2,9 @@ const express = require('express');
 const { sequelize } = require('./models/index.js');
 const app = express();
 var bodyParser = require('body-parser')
-const port = 80;
+require('dotenv').config();
+
+const port = process.env.PORT;
 
 const routes = require('./routes/web.js');
 
