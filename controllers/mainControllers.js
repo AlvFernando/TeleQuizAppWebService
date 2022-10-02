@@ -33,6 +33,7 @@ const mainController = {
     },
 
     //required as body:
+    //key
     //userTypeId
     quiz : async function(req,res){
         //1. demo
@@ -106,7 +107,9 @@ const mainController = {
     //key
     //...
     addQuestion : async function(req,res){
+        console.log('hit');
         console.log(req.body);
+        res.send('hello');
     }
 }
 
