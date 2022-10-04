@@ -106,30 +106,90 @@ const mainController = {
 
     //required as body:
     //key
-    //...
+    //username
+    //question
+    //options[]
+    //correctOption
+    //questionType
+    //assetPath *not fix yet*
     addQuestion : async function(req,res){
+        //400 -> bad request
+        //201 -> data created
+        //500 -> internal server error
+        var statusCode;
+        var message;
         if(req.body.key==process.env.API_KEY){
-            const validation = [true,true,true,true,true,true,true];
-            const questiontype = [1,2];
-            try{
-                //validation field
-                validation[0] = validator.isLength(req.body.username,[{min:0,max:30}]);
-                validation[1] = validator.isLength(req.body.question,[{min:0,max:100}]);
-                for(var i=0;i<req.body.option.length;i++){
-                    validation[i+2] = validator.isLength(req.body.option[i],[{min:0,max:50}]);
+            //simple validation
+            var validation = [true,true,true,true,true,true,true,true,true];
+            var validationMessage = [
+                "username field must be between 1-30 length",
+                "question field must be between 3-100 length",
+                "option A field must be between 1-50 length",
+                "option B field must be between 1-50 length",
+                "option C field must be between 1-50 length",
+                "option D field must be between 1-50 length",
+                "correct answer not included in options given",
+                "question type must be in 1 or 2",
+            ]
+            const questiontype = ['1','2'];
+
+            //validation field
+            validation[0] = validator.isLength(req.body.username,1,30);
+            validation[1] = validator.isLength(req.body.question,3,100);
+            for(var i=0;i<req.body.options.length;i++){
+                validation[i+2] = validator.isLength(req.body.options[i],1,50);
+            }
+            validation[6] = validator.isIn(req.body.correctOption,req.body.options);
+            validation[7] = validator.isIn(req.body.questionType,questiontype);
+            //*
+            //validation for asset to be update
+            //*
+            if(validation.includes(false)){
+                statusCode = 400;
+                message = "validation error";
+            }else{
+                //calling sp to create question
+                try{
+                    const data = await sequelize.query("EXEC SP_AddQuizQuestion :username,:question,"+
+                    ":optionA,:optionB,:optionC,:optionD,:correctOption,:questionType,:assetPath", 
+                    { 
+                        replacements: {
+                            username: req.body.username, 
+                            question: req.body.question,
+                            optionA: req.body.options[0],
+                            optionB: req.body.options[1],
+                            optionC: req.body.options[2],
+                            optionD: req.body.options[3],
+                            correctOption: req.body.correctOption,
+                            questionType: req.body.questionType,
+                            assetPath: (req.body.assetPath) ? req.body.assetPath:null,
+                        }, 
+                        type: QueryTypes.SELECT 
+                    });
+                    statusCode = 201;
+                    message = "data created successfully";
+                }catch(error){
+                    statusCode = 500;
+                    message = error;
                 }
-                validation[6] = validator.isIn(req.body.questiontype,questiontype);
-                console.log(validation);
-            }catch(error){
-                return res.status(500).json({error:'invalid asset name.'});
             }
         }else{
-            return res.status(500).json({error:'invalid key value.'});
+            statusCode = 400;
+            message = "invalid key value";
         }
-
-        //console.log('hit');
-        //console.log(req.body);
-        //res.send('hello');
+        return res.status(statusCode).json({
+            message : message,
+            data:{
+                username: (!validation[0]) ? validationMessage[0] : '-',
+                question: (!validation[1]) ? validationMessage[1] : '-',
+                optionA: (!validation[2]) ? validationMessage[2] : '-',
+                optionB: (!validation[3]) ? validationMessage[3] : '-',
+                optionC: (!validation[4]) ? validationMessage[4] : '-',
+                optionD: (!validation[5]) ? validationMessage[5] : '-',
+                correctOption: (!validation[6]) ? validationMessage[6] : '-',
+                questionType: (!validation[7]) ? validationMessage[7] : '-',
+            }
+        });
     }
 }
 
