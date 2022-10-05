@@ -120,10 +120,23 @@ const mainController = {
         var message;
         if(req.body.key==process.env.API_KEY){
             //simple validation
-            var validation = [true,true,true,true,true,true,true,true,true];
+            var validation = [
+                [true],//username
+                [true,true],//question
+                [true],//optionA
+                [true],//optionB
+                [true],//optionC
+                [true],//optionD
+                [true],//correctAnswer
+                [true],//questionType
+                [true]//assetPath
+            ];
             var validationMessage = [
                 "username field must be between 1-30 length",
-                "question field must be between 3-100 length",
+                [
+                    "question field must be between 3-100 length",
+                    "question must be unique"
+                ],
                 "option A field must be between 1-50 length",
                 "option B field must be between 1-50 length",
                 "option C field must be between 1-50 length",
@@ -134,17 +147,18 @@ const mainController = {
             const questiontype = ['1','2'];
 
             //validation field
-            validation[0] = validator.isLength(req.body.username,1,30);
-            validation[1] = validator.isLength(req.body.question,3,100);
+            validation[0][0] = validator.isLength(req.body.username,1,30);
+            validation[1][0] = validator.isLength(req.body.question,3,100);
             for(var i=0;i<req.body.options.length;i++){
-                validation[i+2] = validator.isLength(req.body.options[i],1,50);
+                validation[i+2][0] = validator.isLength(req.body.options[i],1,50);
             }
-            validation[6] = validator.isIn(req.body.correctOption,req.body.options);
-            validation[7] = validator.isIn(req.body.questionType,questiontype);
+            validation[6][0] = validator.isIn(req.body.correctOption,req.body.options);
+            validation[7][0] = validator.isIn(req.body.questionType,questiontype);
             //*
             //validation for asset to be update
             //*
-            if(validation.includes(false)){
+
+            if(validation.some(row => row.includes(false))){
                 statusCode = 400;
                 message = "validation error";
             }else{
@@ -170,7 +184,8 @@ const mainController = {
                     message = "data created successfully";
                 }catch(error){
                     statusCode = 500;
-                    message = error;
+                    message = "internal server error";
+                    validation[1][1] = false;
                 }
             }
         }else{
@@ -180,14 +195,17 @@ const mainController = {
         return res.status(statusCode).json({
             message : message,
             data:{
-                username: (!validation[0]) ? validationMessage[0] : '-',
-                question: (!validation[1]) ? validationMessage[1] : '-',
-                optionA: (!validation[2]) ? validationMessage[2] : '-',
-                optionB: (!validation[3]) ? validationMessage[3] : '-',
-                optionC: (!validation[4]) ? validationMessage[4] : '-',
-                optionD: (!validation[5]) ? validationMessage[5] : '-',
-                correctOption: (!validation[6]) ? validationMessage[6] : '-',
-                questionType: (!validation[7]) ? validationMessage[7] : '-',
+                username: (!validation[0][0]) ? validationMessage[0] : '-',
+                question: [
+                    (!validation[1][0]) ? validationMessage[1][0] : '-',
+                    (!validation[1][1]) ? validationMessage[1][1] : '',
+                ],
+                optionA: (!validation[2][0]) ? validationMessage[2] : '-',
+                optionB: (!validation[3][0]) ? validationMessage[3] : '-',
+                optionC: (!validation[4][0]) ? validationMessage[4] : '-',
+                optionD: (!validation[5][0]) ? validationMessage[5] : '-',
+                correctOption: (!validation[6][0]) ? validationMessage[6] : '-',
+                questionType: (!validation[7][0]) ? validationMessage[7] : '-',
             }
         });
     }
