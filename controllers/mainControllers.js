@@ -118,32 +118,33 @@ const mainController = {
         //500 -> internal server error
         var statusCode;
         var message;
+
+        var validation = [
+            [true],//username
+            [true,true],//question
+            [true],//optionA
+            [true],//optionB
+            [true],//optionC
+            [true],//optionD
+            [true],//correctAnswer
+            [true],//questionType
+            [true]//assetPath
+        ];
+        var validationMessage = [
+            "username field must be between 1-30 length",
+            [
+                "question field must be between 3-100 length",
+                "question must be unique"
+            ],
+            "option A field must be between 1-50 length",
+            "option B field must be between 1-50 length",
+            "option C field must be between 1-50 length",
+            "option D field must be between 1-50 length",
+            "correct answer not included in options given",
+            "question type must be in 1 or 2",
+        ]
         if(req.body.key==process.env.API_KEY){
             //simple validation
-            var validation = [
-                [true],//username
-                [true,true],//question
-                [true],//optionA
-                [true],//optionB
-                [true],//optionC
-                [true],//optionD
-                [true],//correctAnswer
-                [true],//questionType
-                [true]//assetPath
-            ];
-            var validationMessage = [
-                "username field must be between 1-30 length",
-                [
-                    "question field must be between 3-100 length",
-                    "question must be unique"
-                ],
-                "option A field must be between 1-50 length",
-                "option B field must be between 1-50 length",
-                "option C field must be between 1-50 length",
-                "option D field must be between 1-50 length",
-                "correct answer not included in options given",
-                "question type must be in 1 or 2",
-            ]
             const questiontype = ['1','2'];
 
             //validation field
@@ -153,7 +154,7 @@ const mainController = {
                 validation[i+2][0] = validator.isLength(req.body.options[i],1,50);
             }
             validation[6][0] = validator.isIn(req.body.correctOption,req.body.options);
-            validation[7][0] = validator.isIn(req.body.questionType,questiontype);
+            validation[7][0] = validator.isIn(String(req.body.questionType),questiontype);
             //*
             //validation for asset to be update
             //*
@@ -195,17 +196,17 @@ const mainController = {
         return res.status(statusCode).json({
             message : message,
             data:{
-                username: (!validation[0][0]) ? validationMessage[0] : '-',
+                username: (!validation[0][0]) ? validationMessage[0] : '',
                 question: [
-                    (!validation[1][0]) ? validationMessage[1][0] : '-',
+                    (!validation[1][0]) ? validationMessage[1][0] : '',
                     (!validation[1][1]) ? validationMessage[1][1] : '',
                 ],
-                optionA: (!validation[2][0]) ? validationMessage[2] : '-',
-                optionB: (!validation[3][0]) ? validationMessage[3] : '-',
-                optionC: (!validation[4][0]) ? validationMessage[4] : '-',
-                optionD: (!validation[5][0]) ? validationMessage[5] : '-',
-                correctOption: (!validation[6][0]) ? validationMessage[6] : '-',
-                questionType: (!validation[7][0]) ? validationMessage[7] : '-',
+                optionA: (!validation[2][0]) ? validationMessage[2] : '',
+                optionB: (!validation[3][0]) ? validationMessage[3] : '',
+                optionC: (!validation[4][0]) ? validationMessage[4] : '',
+                optionD: (!validation[5][0]) ? validationMessage[5] : '',
+                correctOption: (!validation[6][0]) ? validationMessage[6] : '',
+                questionType: (!validation[7][0]) ? validationMessage[7] : '',
             }
         });
     }
