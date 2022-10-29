@@ -219,6 +219,7 @@ const mainController = {
         if(req.body.key == process.env.API_KEY){
             var statusCode;
             var message;
+            var responseData;
             try {
                 const data = await sequelize.query("EXEC SP_Leaderboard", 
                 { 
@@ -229,14 +230,15 @@ const mainController = {
             } catch (error) {
                 statusCode = 500;
                 message = error;
+                responseData = data;
             } 
         }else{
-            statusCode = 500;
+            statusCode = 400;
             message = 'invalid key value.'
         }
         return res.status(statusCode).json({
             message : message,
-            data : (data) ? data : ''
+            data : (responseData) ? responseData : ''
         });
     }
 }
