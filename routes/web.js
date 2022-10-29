@@ -9,5 +9,6 @@ routes.get('/assets/:key/:assetName',controller.mainController.assets);
 routes.post('/profile',controller.mainController.profile);
 routes.get('/profile_picture/:key/:assetName',controller.mainController.profilePicture);
 routes.post('/add_question',controller.mainController.addQuestion);
+routes.post('/leaderboard',controller.mainController.leaderboard);
 
 module.exports = routes;

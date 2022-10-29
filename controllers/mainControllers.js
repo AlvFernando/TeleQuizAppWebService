@@ -209,6 +209,35 @@ const mainController = {
                 questionType: (!validation[7][0]) ? validationMessage[7] : '',
             }
         });
+    },
+
+    //leaderboard
+    //required as body:
+    //key
+    //will return leaderboard data based on 1 week ago until today
+    leaderboard : async function(req,res){
+        if(req.body.key == process.env.API_KEY){
+            var statusCode;
+            var message;
+            try {
+                const data = await sequelize.query("EXEC SP_Leaderboard", 
+                { 
+                    type: QueryTypes.SELECT 
+                });
+                statusCode = 200;
+                message = 'success';
+            } catch (error) {
+                statusCode = 500;
+                message = error;
+            } 
+        }else{
+            statusCode = 500;
+            message = 'invalid key value.'
+        }
+        return res.status(statusCode).json({
+            message : message,
+            data : (data) ? data : ''
+        });
     }
 }
 
