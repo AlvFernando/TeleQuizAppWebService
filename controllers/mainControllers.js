@@ -227,10 +227,10 @@ const mainController = {
                 });
                 statusCode = 200;
                 message = 'success';
+                responseData = data;
             } catch (error) {
                 statusCode = 500;
                 message = error;
-                responseData = data;
             } 
         }else{
             statusCode = 400;
