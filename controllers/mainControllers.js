@@ -41,16 +41,27 @@ const mainController = {
         //2. general
         //3. tele
         if(req.body.key == process.env.API_KEY){
+            var statusCode;
+            var message;
+            var responseData;
             const spList = ['SP_GetQuizDemo','SP_GetQuizGeneral','SP_GetQuizTele'];
             try{
                 const data = await sequelize.query("EXEC "+spList[parseInt(req.body.userTypeId)-1]);
-                res.send(data);
+                statusCode = 200;
+                message = 'success';
+                responseData = data;
             }catch(error){
-                return res.status(500).json({error:'invalid userTypeId.'});
+                statusCode = 500;
+                message = 'invalid userTypeId.';
             }
         }else{
-            return res.status(500).json({error:'invalid key value.'});
+            statusCode = 500;
+            message = 'invalid key value.';
         }
+        return res.status(statusCode).json({
+            message : message,
+            data : (responseData) ? responseData : ''
+        });
     },
 
     //required as params:
