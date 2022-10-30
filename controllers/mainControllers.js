@@ -46,7 +46,10 @@ const mainController = {
             var responseData;
             const spList = ['SP_GetQuizDemo','SP_GetQuizGeneral','SP_GetQuizTele'];
             try{
-                const data = await sequelize.query("EXEC "+spList[parseInt(req.body.userTypeId)-1]);
+                const data = await sequelize.query("EXEC "+spList[parseInt(req.body.userTypeId)-1],
+                { 
+                    type: QueryTypes.SELECT 
+                });
                 statusCode = 200;
                 message = 'success';
                 responseData = data;
