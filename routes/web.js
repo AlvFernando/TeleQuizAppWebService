@@ -10,5 +10,6 @@ routes.post('/profile',controller.mainController.profile);
 routes.get('/profile_picture/:key/:assetName',controller.mainController.profilePicture);
 routes.post('/add_question',controller.mainController.addQuestion);
 routes.post('/leaderboard',controller.mainController.leaderboard);
+routes.post('/quiz_attempt',controller.mainController.quizAttempt);
 
 module.exports = routes;
