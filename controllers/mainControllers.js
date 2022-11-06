@@ -254,6 +254,42 @@ const mainController = {
             message : message,
             data : (responseData) ? responseData : ''
         });
+    },
+
+    //quiz attempt
+    //require as body:
+    //key
+    //userId
+    //score
+    //correctAnswer
+    //wrongAnswer
+    quizAttempt : async function(req,res){
+        if(req.body == key.process.API_KEY){
+            try{
+                const responseData = await sequelize.query("EXEC SP_QuizAttempt :userID, :score, :correctAnswer, :wrongAnswer",{
+                    replacements: {
+                        userId: req.body.userId,
+                        score: req.body.score,
+                        correctAnswer: req.body.correctAnswer,
+                        wrongAnswer: req.body.wrongAnswer
+                    },
+                    type: QueryTypes.SELECT
+                });
+                statusCode = 201;
+                message = 'data created successfully';
+                data = responseData;
+            }catch(error){
+                statusCode = 500;
+                message = error
+            }
+        }else{
+            statusCode = 400;
+            message = 'invalid key value.'
+        }
+        return res.status(statusCode).json({
+            message : message,
+            data : (responseData) ? responseData : ''
+        });
     }
 }
 
