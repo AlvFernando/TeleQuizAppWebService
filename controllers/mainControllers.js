@@ -264,12 +264,15 @@ const mainController = {
     //correctAnswer
     //wrongAnswer
     quizAttempt : async function(req,res){
-        if(req.body == key.process.API_KEY){
+		var statusCode;
+        var message;
+        var responseData;
+        if(req.body.key == process.env.API_KEY){
             try{
-                const responseData = await sequelize.query("EXEC SP_QuizAttempt :userID, :score, :correctAnswer, :wrongAnswer",{
+                const data = await sequelize.query("EXEC SP_QuizAttempt :userID, :score, :correctAnswer, :wrongAnswer",{
                     replacements: {
-                        userId: req.body.userId,
-                        score: req.body.score,
+                        userID: req.body.userId,
+                        score: parseInt(req.body.score, 10),
                         correctAnswer: req.body.correctAnswer,
                         wrongAnswer: req.body.wrongAnswer
                     },
@@ -277,7 +280,7 @@ const mainController = {
                 });
                 statusCode = 201;
                 message = 'data created successfully';
-                data = responseData;
+                responseData = data;
             }catch(error){
                 statusCode = 500;
                 message = error
